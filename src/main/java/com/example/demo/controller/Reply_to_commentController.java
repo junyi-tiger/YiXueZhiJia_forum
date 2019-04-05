@@ -70,5 +70,4 @@ public class Reply_to_commentController {
                 .collect(Collectors.toList());
         return new Resources<>(replies,linkTo(methodOn(Reply_to_commentController.class).all()).withSelfRel());
     }
-
 }
