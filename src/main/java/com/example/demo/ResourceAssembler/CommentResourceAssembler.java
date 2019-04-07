@@ -1,9 +1,7 @@
 package com.example.demo.ResourceAssembler;
 
 import com.example.demo.controller.CommentController;
-import com.example.demo.controller.EmployeeController;
 import com.example.demo.entity.Comment;
-import com.example.demo.entity.Employee;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.stereotype.Component;

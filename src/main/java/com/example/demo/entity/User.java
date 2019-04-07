@@ -21,7 +21,7 @@ public class User {
     private String UName;//用户名
     @NotNull
     private String UPassword;//用户密码
-    @NotNull
+    @NotNull @Column(unique = true)
     private String UEmail;//用户电子邮箱
     @NotNull
     private int USex;//用户性别（0：女，1：男，2：未知）

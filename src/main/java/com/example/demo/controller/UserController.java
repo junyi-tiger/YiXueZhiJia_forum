@@ -9,12 +9,12 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.core.DummyInvocationUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -50,7 +50,8 @@ public class UserController {
      * @return
      */
     @PostMapping("/users/login")
-    public User verify(@Nullable @RequestParam String name, @RequestParam String password, @Nullable @RequestParam String email){
+    @ResponseBody
+    public ResponseEntity<Resource<User>> verify(@Nullable @RequestParam String name, @RequestParam String password, @Nullable @RequestParam String email){
         User user = new User();
         user.setUName(name);
         user.setUPassword(password);
@@ -60,16 +61,30 @@ public class UserController {
                 .withIgnoreCase()
                 //忽略register_time等字段
                 .withIgnorePaths("register_time","UId","USex","UHead","UState","URole")
-                //忽略为空字段
+//                //忽略为空字段
                 .withIgnoreNullValues();
         Example<User> example = Example.of(user, exampleMatcher);
-        Optional<User> optional = repository.findOne(example);
-        if (optional.isPresent()){
-            return optional.get();
-        } else {
-            User one = new User();
-            one.setUName("not found");
-            return one;
+        List<User> users = repository.findAll(example);
+        if (users==null||users.isEmpty())return new ResponseEntity<>(HttpStatus.NOT_FOUND);//未找到用户
+        return new ResponseEntity<>(assembler.toResource(users.get(0)),HttpStatus.OK);//登录成功
+    }
+
+    /**
+     * 新增用户/用户注册
+     * @param user
+     * @return
+     */
+    @PostMapping("/users/register")
+    public ResponseEntity<Resource<User>> newUser(@RequestBody User user){
+        ResponseEntity<Resource<User>> return_User = verify(user.getUName(),user.getUPassword(),null);
+        ResponseEntity<Resource<User>> return_User2 = verify(null,user.getUPassword(),user.getUEmail());
+        if (return_User.getStatusCode()==HttpStatus.NOT_FOUND&&return_User2.getStatusCode()==HttpStatus.NOT_FOUND){
+            //相同用户名或邮箱的用户都不存在，可以进行注册
+            return new ResponseEntity<>(assembler.toResource(repository.save(user)),HttpStatus.OK);
+        }else {
+            //相同用户名或邮箱的用户已经存在，不能注册
+            ResponseEntity<Resource<User>> responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return responseEntity;
         }
     }
 
@@ -86,39 +101,28 @@ public class UserController {
     }
 
     /**
-     * 新增用户/用户注册
-     * @param user
-     * @return
-     */
-    @PostMapping("/users/register")
-    public User newUser(@RequestBody User user){
-        return repository.save(user);
-    }
-
-    /**
      * 修改指定id的用户
-     * @param newUser
-     * @param id
+     * @param newUser   新用户的信息
+     * @param id    原来用户的id
      * @return
      */
     @PutMapping("/users/{id}")
-    public Resource<User> replaceUser(@RequestBody User newUser, @PathVariable Long id){
-        return repository.findById(id)
+    public ResponseEntity<Resource<User>> replaceUser(@RequestBody User newUser, @PathVariable Long id){
+        Resource<User> userResource = repository.findById(id)
                 .map(user -> {
                     user.setUName(newUser.getUName());
                     user.setUPassword(newUser.getUPassword());
                     user.setUEmail(newUser.getUEmail());
-                    user.setRegister_time(newUser.getRegister_time());
+                    //用户注册时间不用修改
+//                    user.setRegister_time(newUser.getRegister_time());
                     user.setUHead(newUser.getUHead());
                     user.setUSex(newUser.getUSex());
                     user.setUState(newUser.getUState());
                     user.setURole(newUser.getURole());
                     return assembler.toResource(repository.save(user));
                 })
-                .orElseGet(()->{
-                    newUser.setUId(id);
-                    return assembler.toResource(repository.save(newUser));
-                });
+                .orElseThrow(()->new NotFoundResourceException("user",id));
+        return new ResponseEntity<>(userResource, HttpStatus.OK);
     }
 
     /**

@@ -28,6 +28,8 @@ public class Post {
     private String PContent;//帖子内容
     private int PLike_num;//帖子点赞数
     private int PComments;//帖子评论数
+    private int PCollection_num;//帖子收藏数
+
     private int PState;//帖子状态
     private int PTag;//帖子标签
     private Timestamp Post_time = Timestamp.valueOf(LocalDateTime.now());//帖子发表时间

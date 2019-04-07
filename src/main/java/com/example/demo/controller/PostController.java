@@ -8,6 +8,8 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,11 +44,19 @@ public class PostController {
 
     /**
      * 获取所有帖子
+     * 按帖子发表时间倒序
      * @return
      */
     @RequestMapping("/posts")
     public Resources<Resource<Post>> all(){
-        List<Resource<Post>> posts= repository.findAll().stream()
+        List<Post> all_posts = repository.findAll();
+        Collections.sort(all_posts, new Comparator<Post>() {
+            @Override
+            public int compare(Post o1, Post o2) {
+                return o2.getPost_time().compareTo(o1.getPost_time());
+            }
+        });
+        List<Resource<Post>> posts= all_posts.stream()
                 .map(assembler::toResource)
                 .collect(Collectors.toList());
         return new Resources<>(posts,linkTo(methodOn(PostController.class).all()).withSelfRel());
@@ -60,28 +70,6 @@ public class PostController {
     @PostMapping("/posts")
     public Resource<Post> newPost(@RequestBody Post post){
         return assembler.toResource(repository.save(post));
-    }
-
-    /**
-     * 修改指定id的帖子
-     * @param newPost
-     * @param id
-     * @return
-     */
-    @PutMapping("/posts/{id}")
-    public Resource<Post> replacePost(@RequestBody Post newPost, @PathVariable Long id){
-        return repository.findById(id)
-                .map(post->{
-                    post.setPTitle(newPost.getPTitle());
-                    post.setPContent(newPost.getPContent());
-                    post.setPState(newPost.getPState());
-                    post.setPTag(newPost.getPTag());
-                    return assembler.toResource(post);
-                })
-                .orElseGet(()->{
-                    newPost.setPID(id);
-                    return assembler.toResource(repository.save(newPost));
-                });
     }
 
     /**
