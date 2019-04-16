@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.LikePost;
 import com.example.demo.entity.Post;
-import com.example.demo.exception.NotFoundResourceException;
 import com.example.demo.repository.LikePostRepository;
 import com.example.demo.repository.PostRepository;
 import org.springframework.data.domain.Example;
@@ -58,7 +57,6 @@ public class LikePostController {
      * @return
      */
     @PostMapping("/likeposts")
-    @ResponseBody
     public ResponseEntity<LikePost> newLikePost(@RequestBody LikePost likePost){
         ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withIgnoreCase()

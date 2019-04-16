@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.ResourceAssembler.UserResourceAssembler;
 import com.example.demo.entity.User;
+import com.example.demo.entity.UserInfo;
 import com.example.demo.exception.NotFoundResourceException;
 import com.example.demo.repository.UserRepository;
 import org.springframework.data.domain.Example;
@@ -11,7 +12,6 @@ import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.core.DummyInvocationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,18 +44,17 @@ public class UserController {
 
     /**
      * 用户登录验证
-     * @param name
-     * @param password
-     * @param email
      * @return
      */
     @PostMapping("/users/login")
-    @ResponseBody
-    public ResponseEntity<Resource<User>> verify(@Nullable @RequestParam String name, @RequestParam String password, @Nullable @RequestParam String email){
+    public ResponseEntity<Resource<User>> verify(@RequestBody UserInfo userInfo){
         User user = new User();
-        user.setUName(name);
-        user.setUPassword(password);
-        user.setUEmail(email);
+        String name = userInfo.getName();
+        String password = userInfo.getPassword();
+        String email = userInfo.getEmail();
+        if (name!=null)user.setUName(name);
+        if (password!=null)user.setUPassword(password);
+        if (email!=null)user.setUEmail(email);
         ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 //忽略大小写
                 .withIgnoreCase()
@@ -76,9 +75,12 @@ public class UserController {
      */
     @PostMapping("/users/register")
     public ResponseEntity<Resource<User>> newUser(@RequestBody User user){
-        ResponseEntity<Resource<User>> return_User = verify(user.getUName(),user.getUPassword(),null);
-        ResponseEntity<Resource<User>> return_User2 = verify(null,user.getUPassword(),user.getUEmail());
-        if (return_User.getStatusCode()==HttpStatus.NOT_FOUND&&return_User2.getStatusCode()==HttpStatus.NOT_FOUND){
+        UserInfo userInfo = new UserInfo();
+        userInfo.setName(user.getUName());
+        userInfo.setPassword(user.getUPassword());
+        userInfo.setEmail(user.getUEmail());
+        ResponseEntity<Resource<User>> return_User = verify(userInfo);
+        if (return_User.getStatusCode()==HttpStatus.NOT_FOUND){
             //相同用户名或邮箱的用户都不存在，可以进行注册
             return new ResponseEntity<>(assembler.toResource(repository.save(user)),HttpStatus.OK);
         }else {

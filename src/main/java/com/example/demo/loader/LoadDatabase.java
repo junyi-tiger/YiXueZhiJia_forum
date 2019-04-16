@@ -38,6 +38,7 @@ public class LoadDatabase {
         return args -> {
             //init 用户
             User user = new User("放空的心", "123456","yijun0226@foxmail.com",1);
+            user.setUHead("3");
             user.setUId(1L);
             //init 帖子
             Post post = new Post(1L, "This is the Title","Hello, this is the content");

@@ -87,15 +87,24 @@ public class CollectionController {
 
     /**
      * 删除收藏,同时帖子的收藏量-1
-     * @param id
      */
-    @DeleteMapping("/collections/{id}")
-    public void deleteCollection(@PathVariable Long id){
-        Collection collection = repository.findById(id).get();
-        Post post = postRepository.findById(collection.getPID()).get();
-        post.setPCollection_num(post.getPCollection_num()-1);
-        postRepository.save(post);
-        repository.deleteById(id);
+    @DeleteMapping("/collections")
+    public void deleteCollection(@RequestBody Collection collection){
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withIgnoreCase()
+                .withIgnoreNullValues()
+                .withIgnorePaths("id","collect_time");
+        Example<Collection> example = Example.of(collection,exampleMatcher);
+        if (repository.exists(example)){
+            Collection collection1 = repository.findOne(example).get();
+            Long cid = collection1.getId();
+            repository.deleteById(cid);
+            Long pid = collection1.getPID();
+            Post post = postRepository.findById(pid).get();
+            post.setPCollection_num(post.getPCollection_num()-1);
+            postRepository.save(post);
+        }
+
     }
 
     /**

@@ -3,7 +3,7 @@
     1.登录
     method: post
     url:    /users/login
-    params: 1:String name, 2:String password, 3:String email
+    params: UserInfo(name,password,email)
     return: User对象
     2.注册
     method: post
@@ -62,8 +62,8 @@
         params: Collection对象
     2.取消收藏(...)
         method: delete
-        url:    /collections/{id}
-        params: id
+        url:    /collections
+        params: Collection(uid,cid)
     3.获取某用户的所有收藏内容
         method: get
         url:    /{uid}/collections

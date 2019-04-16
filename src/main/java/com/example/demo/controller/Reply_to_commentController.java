@@ -90,7 +90,7 @@ public class Reply_to_commentController {
      * 以下是一些常用操作
      */
     //查询并返回某评论（由id指定）的所有回复(按回复时间排序）
-    @PostMapping("/comments/{comment_id}/replies_to_comment")
+    @GetMapping("/comments/{comment_id}/replies_to_comment")
     public Resources<Resource<Reply_to_comment>> replies_to_comment(@PathVariable Long comment_id){
         Reply_to_comment reply_to_comment = new Reply_to_comment();
         reply_to_comment.setCID(comment_id);
