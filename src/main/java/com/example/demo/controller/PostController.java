@@ -9,7 +9,6 @@ import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +18,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 /**
  * 帖子对应的controller
  */
-@RestController
+//@RestController
 public class PostController {
 
     private final PostRepository repository;
@@ -35,11 +34,13 @@ public class PostController {
      * @param id
      * @return
      */
-    @RequestMapping("/posts/{id}")
+    @GetMapping("/posts/{id}")
     public Resource<Post> one(@PathVariable Long id){
-        Post post = repository.findById(id)
-                .orElseThrow(()->new NotFoundResourceException("post",id));
-        return assembler.toResource(post);
+//        Post post = repository.findById(id)
+//                .orElseThrow(()->new NotFoundResourceException("post",id));
+//        return assembler.toResource(post);
+        Post post;
+        return assembler.toResource(repository.findById(id).orElseThrow(()->new NotFoundResourceException("post",id)));
     }
 
     /**
@@ -47,15 +48,10 @@ public class PostController {
      * 按帖子发表时间倒序
      * @return
      */
-    @RequestMapping("/posts")
+    @GetMapping("/posts")
     public Resources<Resource<Post>> all(){
         List<Post> all_posts = repository.findAll();
-        Collections.sort(all_posts, new Comparator<Post>() {
-            @Override
-            public int compare(Post o1, Post o2) {
-                return o2.getPost_time().compareTo(o1.getPost_time());
-            }
-        });
+        Collections.sort(all_posts, (o1, o2) -> o2.getPost_time().compareTo(o1.getPost_time()));
         List<Resource<Post>> posts= all_posts.stream()
                 .map(assembler::toResource)
                 .collect(Collectors.toList());

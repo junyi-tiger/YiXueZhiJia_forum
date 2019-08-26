@@ -6,13 +6,14 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.persistence.GenerationType;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
 @Entity
 @NoArgsConstructor
-public class Reply_to_comment {
+public class Reply_to_comment implements Serializable {
     /**
      * 帖子评论的回复表,存储关于评论的回复
      */

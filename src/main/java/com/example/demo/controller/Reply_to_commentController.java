@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@RestController
+//@RestController
 public class Reply_to_commentController {
 
     private final Reply_to_commentRepository repository;

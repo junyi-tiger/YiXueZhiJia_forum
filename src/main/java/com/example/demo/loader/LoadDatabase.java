@@ -10,6 +10,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Spring Boot will run ALL CommandLineRunner beans once the application context is loaded.
+ * @Slf4j is a Lombok annotation to autocreate an Slf4j-based LoggerFactory as log, allowing us to log these newly created "employees".
+ */
 @Configuration
 @Slf4j
 public class LoadDatabase {
@@ -59,20 +63,31 @@ public class LoadDatabase {
             LikeComment likeComment = new LikeComment(1L,1L);
             likeComment.setId(1L);
 
+            //使用Repository创建
+//            log.info("Preloading " + userRepository.save(user));
+
+            //使用controller创建
             UserController userController = new UserController(userRepository,userResourceAssembler);
-            userController.newUser(user);
+//            userController.newUser(user);
+            log.info("Preloading " + userController.newUser(user));
             PostController postController = new PostController(postRepository, postResourceAssembler);
-            postController.newPost(post);
+//            postController.newPost(post);
+            log.info("Preloading " + postController.newPost(post));
             CommentController commentController = new CommentController(commentRepository,commentResourceAssembler,postRepository);
-            commentController.newComment(comment);
+//            commentController.newComment(comment);
+            log.info("Preloading " + commentController.newComment(comment));
             Reply_to_commentController reply_to_commentController = new Reply_to_commentController(reply_to_commentRepository,reply_to_commentResourceAssembler,commentRepository);
-            reply_to_commentController.newReply(reply_to_comment);
+//            reply_to_commentController.newReply(reply_to_comment);
+            log.info("Preloading " + reply_to_commentController.newReply(reply_to_comment));
             CollectionController collectionController = new CollectionController(collectionRepository,collectionResourceAssembler,postRepository);
-            collectionController.newCollection(collection);
+//            collectionController.newCollection(collection);
+            log.info("Preloading " + collectionController.newCollection(collection));
             LikePostController likePostController = new LikePostController(likePostRepository,postRepository);
-            likePostController.newLikePost(likePost);
+//            likePostController.newLikePost(likePost);
+            log.info("Preloading " + likePostController.newLikePost(likePost));
             LikeCommentController likeCommentController = new LikeCommentController(likeCommentRepository,commentRepository);
-            likeCommentController.newLikeComment(likeComment);
+//            likeCommentController.newLikeComment(likeComment);
+            log.info("Preloading " + likeCommentController.newLikeComment(likeComment));
         };
     }
 }

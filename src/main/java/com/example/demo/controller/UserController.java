@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-@RestController
+//@RestController
 public class UserController {
 
     private final UserRepository repository;//用户repository

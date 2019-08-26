@@ -4,8 +4,6 @@ import com.example.demo.entity.Post;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import javafx.geometry.Pos;
-import jdk.nashorn.internal.objects.Global;
-import jdk.nashorn.internal.parser.JSONParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

@@ -8,13 +8,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
 @Entity
 @NoArgsConstructor
-public class Comment {
+public class Comment implements Serializable {
     /**
      * 帖子评论表，存储帖子的评论信息
      */

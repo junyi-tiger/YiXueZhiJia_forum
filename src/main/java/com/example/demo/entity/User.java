@@ -5,13 +5,19 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+/*
+ * @Data: is a Lombok annotation to create all the getters, setters, equals, hash, and toString methods, based on the fields.
+ * @Entity: is a JPA annotation to make the object ready for storage in a JPA-based data store.
+ * @NoArgsConstructor: is a lombok annotation, adds a constructor without arguments.
+ * */
 @Data
 @Entity
 @NoArgsConstructor
-public class User {
+public class User implements Serializable {
     /**
      * 用户表，存储用户信息
      */
