@@ -10,12 +10,12 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Component
-public class UserResourceAssembler implements ResourceAssembler<User, Resource<User>> {
-
+public class UserAssembler implements Assembler<User> {
     @Override
-    public Resource<User> toResource(User user) {
-        return new Resource<>(user,
-                linkTo(methodOn(UserController.class).one(user.getUId())).withSelfRel(),
-                linkTo(methodOn(UserController.class).all()).withRel("users"));
+    public User toResource(User user) {
+        user.add(linkTo(methodOn(UserController.class).one(user.getUId())).withSelfRel());
+        user.add(linkTo(methodOn(UserController.class).all()).withRel("users"));
+        return user;
     }
+
 }

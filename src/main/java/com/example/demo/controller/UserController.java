@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.ResourceAssembler.UserResourceAssembler;
+import com.example.demo.ResourceAssembler.UserAssembler;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserInfo;
 import com.example.demo.exception.NotFoundResourceException;
@@ -9,7 +9,6 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.core.DummyInvocationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,36 +17,48 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-//@RestController
+/**
+ * @RestController indicates that the data returned by each method will be written straight into the response body instead of rendering a template.
+ */
+@RestController
+@RequestMapping("/users")
 public class UserController {
 
     private final UserRepository repository;//用户repository
-    private final UserResourceAssembler assembler;//用户ResourceAssembler
+    private final UserAssembler assembler;
 
-    public UserController(UserRepository repository, UserResourceAssembler assembler){
+    /**
+     * An UserRepository is injected by constructor into the controller.
+     * @param repository userRepository
+     * @param assembler userAssembler
+     */
+    public UserController(UserRepository repository, UserAssembler assembler){
         this.repository = repository;
         this.assembler = assembler;
     }
 
     /**
      * 获取指定id的用户
-     * @param id
-     * @return
+     * @param id 用户id
+     * @return 该用户
      */
-    @GetMapping("/users/{id}")
-    public Resource<User> one(@PathVariable Long id){
+    @GetMapping("/{id}")
+    public User one(@PathVariable Long id){
         User user = repository.findById(id)
                 .orElseThrow(()->new NotFoundResourceException("user",id));
-        return assembler.toResource(user);
+        user.add(linkTo(methodOn(UserController.class).one(id)).withSelfRel());
+        user.add(linkTo(methodOn(UserController.class).all()).withRel("users"));
+        return user;
     }
 
     /**
      * 用户登录验证
-     * @return
+     * @return ResponseEntity<> 用户不存在则返回空，用户存在返回该用户
      */
-    @PostMapping("/users/login")
-    public ResponseEntity<Resource<User>> verify(@RequestBody UserInfo userInfo){
+    @PostMapping("/login")
+    public ResponseEntity<User> verify(@RequestBody UserInfo userInfo){
         User user = new User();
         String name = userInfo.getName();
         String password = userInfo.getPassword();
@@ -70,47 +81,47 @@ public class UserController {
 
     /**
      * 新增用户/用户注册
-     * @param user
-     * @return
+     * @param user 用户信息
+     * @return ResponseEntity
      */
-    @PostMapping("/users/register")
-    public ResponseEntity<Resource<User>> newUser(@RequestBody User user){
+    @PostMapping("/register")
+    public ResponseEntity<User> newUser(@RequestBody User user){
         UserInfo userInfo = new UserInfo();
         userInfo.setName(user.getUName());
         userInfo.setPassword(user.getUPassword());
         userInfo.setEmail(user.getUEmail());
-        ResponseEntity<Resource<User>> return_User = verify(userInfo);
+        ResponseEntity<User> return_User = verify(userInfo);
         if (return_User.getStatusCode()==HttpStatus.NOT_FOUND){
             //相同用户名或邮箱的用户都不存在，可以进行注册
-            return new ResponseEntity<>(assembler.toResource(repository.save(user)),HttpStatus.OK);
+            return new ResponseEntity<>(assembler.toResource(repository.save(user)), HttpStatus.OK);
         }else {
             //相同用户名或邮箱的用户已经存在，不能注册
-            ResponseEntity<Resource<User>> responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            ResponseEntity<User> responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
             return responseEntity;
         }
     }
 
     /**
      * 获取所有用户
-     * @return
+     * @return 所有用户
      */
-    @GetMapping("/users")
-    public Resources<Resource<User>> all(){
-        List<Resource<User>> users = repository.findAll().stream()
+    @GetMapping("/")
+    public List<User> all(){
+        List<User> users = repository.findAll().stream()
                 .map(assembler::toResource)
                 .collect(Collectors.toList());
-        return new Resources<>(users,linkTo(DummyInvocationUtils.methodOn(UserController.class).all()).withSelfRel());
+        return users;
     }
 
     /**
      * 修改指定id的用户
      * @param newUser   新用户的信息
      * @param id    原来用户的id
-     * @return
+     * @return 修改后的用户
      */
-    @PutMapping("/users/{id}")
-    public ResponseEntity<Resource<User>> replaceUser(@RequestBody User newUser, @PathVariable Long id){
-        Resource<User> userResource = repository.findById(id)
+    @PutMapping("/{id}")
+    public ResponseEntity<User> replaceUser(@RequestBody User newUser, @PathVariable Long id){
+        User userResource = repository.findById(id)
                 .map(user -> {
                     user.setUName(newUser.getUName());
                     user.setUPassword(newUser.getUPassword());
@@ -129,9 +140,9 @@ public class UserController {
 
     /**
      * 删除指定id的用户
-     * @param id
+     * @param id 要删除的用户id
      */
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id){
         repository.deleteById(id);
     }

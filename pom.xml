@@ -24,10 +24,23 @@
 	</properties>
 
 	<dependencies>
+		<!-- Spring boot starter data rest用于快速构建rest的web service -->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-data-rest</artifactId>-->
+<!--		</dependency>-->
+		<!-- hal browser可以帮助我们方便的查看api：访问http://127.0.0.1:8080/browser/index.html即可（即一个RESTful api的浏览器） -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-rest</artifactId>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-rest-hal-browser</artifactId>
 		</dependency>
+
+		<!-- hateoas是一个用于开发RESTful的web应用的工具 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-hateoas</artifactId>
+        </dependency>
+
 		<!-- 使用Spring Data和Hibernate 实现的Persist data in SQL with Java Persistence API -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -73,12 +86,6 @@
 			<artifactId>json-path</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- hateoas是一个用于开发RESTful的web应用的工具 -->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.boot</groupId>-->
-<!--			<artifactId>spring-boot-starter-hateoas</artifactId>-->
-<!--		</dependency>-->
 
 		<!-- gson是google开发的操作json数据格式的官方包 -->
 		<dependency>

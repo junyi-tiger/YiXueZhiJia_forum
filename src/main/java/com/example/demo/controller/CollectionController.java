@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-//@RestController
+@RestController
 public class CollectionController {
 
     private final CollectionRepository repository;

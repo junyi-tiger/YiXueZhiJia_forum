@@ -28,7 +28,7 @@ public class LoadDatabase {
      */
     @Bean
     CommandLineRunner initDatabase(UserRepository userRepository,
-                                   UserResourceAssembler userResourceAssembler,
+                                   UserAssembler userAssembler,
                                    PostRepository postRepository,
                                    PostResourceAssembler postResourceAssembler,
                                    CommentRepository commentRepository,
@@ -67,9 +67,10 @@ public class LoadDatabase {
 //            log.info("Preloading " + userRepository.save(user));
 
             //使用controller创建
-            UserController userController = new UserController(userRepository,userResourceAssembler);
+//            UserController userController = new UserController(userRepository,userResourceAssembler);
+            UserController userController = new UserController(userRepository, userAssembler);
 //            userController.newUser(user);
-            log.info("Preloading " + userController.newUser(user));
+            log.info("Preloading " + userRepository.save(user));
             PostController postController = new PostController(postRepository, postResourceAssembler);
 //            postController.newPost(post);
             log.info("Preloading " + postController.newPost(post));

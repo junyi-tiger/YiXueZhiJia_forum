@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.ResourceSupport;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @NoArgsConstructor
-public class User implements Serializable {
+public class User extends ResourceSupport implements Serializable{
     /**
      * 用户表，存储用户信息
      */
